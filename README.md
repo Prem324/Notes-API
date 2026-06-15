@@ -1096,6 +1096,505 @@ Before deploying:
 
 ---
 
+## Deployment
+
+This Notes API backend is deployed as a production web service.
+
+The deployed API can be used for testing authentication, notes CRUD, comments, file uploads, profile management, analytics, Swagger documentation, and health checks.
+
+---
+
+## Production API URL
+
+```text
+https://your-render-url.onrender.com
+```
+
+Replace the URL above with your actual deployed backend URL.
+
+Example:
+
+```text
+https://notes-api-abc1.onrender.com
+```
+
+---
+
+## Deployment Platform
+
+This backend is deployed using Render.
+
+Deployment flow:
+
+```text
+Local project
+↓
+Git commit
+↓
+Push to GitHub
+↓
+Render pulls latest code
+↓
+Render installs dependencies
+↓
+Render runs npm start
+↓
+API becomes available online
+```
+
+---
+
+## GitHub Repository
+
+The project source code is pushed to GitHub.
+
+Render is connected to the GitHub repository, so future commits pushed to the main branch can trigger redeployment.
+
+---
+
+## Render Web Service Configuration
+
+Recommended Render settings:
+
+| Setting       | Value         |
+| ------------- | ------------- |
+| Service Type  | Web Service   |
+| Runtime       | Node          |
+| Branch        | main          |
+| Build Command | `npm install` |
+| Start Command | `npm start`   |
+
+The project uses the following production start script:
+
+```json
+{
+  "scripts": {
+    "start": "node server.js"
+  }
+}
+```
+
+---
+
+## Production Environment Variables
+
+The deployed server does not use the local `.env` file.
+
+Production environment variables are configured inside the Render dashboard.
+
+Required variables:
+
+```env
+NODE_ENV=production
+PORT=5000
+
+MONGO_URI=your-mongodb-atlas-uri
+
+JWT_SECRET=your-production-jwt-secret
+JWT_EXPIRES_IN=1d
+
+CLIENT_URL=your-frontend-url
+SERVER_URL=your-render-backend-url
+
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+```
+
+Example:
+
+```env
+NODE_ENV=production
+PORT=5000
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/notes-api
+JWT_SECRET=strong-production-secret
+JWT_EXPIRES_IN=1d
+CLIENT_URL=http://localhost:3000
+SERVER_URL=https://your-render-url.onrender.com
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+```
+
+---
+
+## Important Security Notes
+
+Do not commit the real `.env` file to GitHub.
+
+The `.env` file may contain sensitive values such as:
+
+```text
+MongoDB Atlas URI
+JWT secret
+Cloudinary API secret
+```
+
+Only commit `.env.example`.
+
+Recommended `.gitignore` entries:
+
+```text
+node_modules
+.env
+coverage
+```
+
+---
+
+## Database Deployment
+
+The production database is hosted on MongoDB Atlas.
+
+The deployed backend connects to MongoDB Atlas using:
+
+```env
+MONGO_URI=your-mongodb-atlas-uri
+```
+
+MongoDB Atlas requirements:
+
+* Cluster created
+* Database user created
+* Password configured
+* Network access configured
+* Connection string added to Render environment variables
+
+For beginner deployment, Atlas network access may use:
+
+```text
+0.0.0.0/0
+```
+
+This allows the deployed server to connect from Render.
+
+---
+
+## Cloudinary Deployment
+
+Cloudinary is used for:
+
+* Note attachments
+* Profile picture uploads
+* Image storage
+* Image delivery URLs
+
+Required Cloudinary variables:
+
+```env
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+```
+
+These values must be added to Render environment variables.
+
+---
+
+## Health Check
+
+The API includes a health check route.
+
+### Request
+
+```http
+GET /health
+```
+
+### Production Example
+
+```http
+GET https://your-render-url.onrender.com/health
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Server is healthy",
+  "uptime": 123.45,
+  "timestamp": "2026-06-13T08:00:00.000Z",
+  "environment": "production"
+}
+```
+
+The health route is useful for:
+
+* Checking whether the server is live
+* Deployment verification
+* Monitoring tools
+* Render service checks
+
+---
+
+## Swagger API Documentation
+
+Swagger UI is available in production.
+
+### Production Swagger URL
+
+```http
+GET https://your-render-url.onrender.com/api-docs
+```
+
+Swagger provides interactive documentation for:
+
+* Auth routes
+* Notes routes
+* Comment routes
+* User profile routes
+* File upload routes
+* Analytics routes
+* Health route
+
+---
+
+## Postman Production Environment
+
+Create a separate Postman environment for production.
+
+Environment name:
+
+```text
+Notes API Production
+```
+
+Recommended variables:
+
+| Variable       | Value                                  |
+| -------------- | -------------------------------------- |
+| `baseUrl`      | `https://your-render-url.onrender.com` |
+| `token`        | Empty initially                        |
+| `noteId`       | Empty initially                        |
+| `attachmentId` | Empty initially                        |
+| `commentId`    | Empty initially                        |
+
+Use production requests like:
+
+```http
+POST {{baseUrl}}/api/v1/auth/login
+GET {{baseUrl}}/api/v1/notes
+POST {{baseUrl}}/api/v1/notes/{{noteId}}/attachments
+```
+
+Protected routes require:
+
+```http
+Authorization: Bearer {{token}}
+```
+
+---
+
+## Production Routes To Verify
+
+After deployment, these routes should be tested.
+
+### Health
+
+```http
+GET /health
+```
+
+### Swagger
+
+```http
+GET /api-docs
+```
+
+### Auth
+
+```http
+POST /api/v1/auth/register
+POST /api/v1/auth/login
+GET /api/v1/auth/profile
+```
+
+### Notes
+
+```http
+GET /api/v1/notes
+POST /api/v1/notes
+PUT /api/v1/notes/:id
+DELETE /api/v1/notes/:id
+POST /api/v1/notes/:id/attachments
+DELETE /api/v1/notes/:noteId/attachments/:attachmentId
+```
+
+### Comments
+
+```http
+POST /api/v1/comments/:noteId
+GET /api/v1/comments/note/:noteId
+```
+
+### Users
+
+```http
+GET /api/v1/users/profile
+PATCH /api/v1/users/profile-picture
+DELETE /api/v1/users/profile-picture
+```
+
+### Analytics
+
+```http
+GET /api/v1/analytics/notes-per-user
+GET /api/v1/analytics/comments-per-note
+GET /api/v1/analytics/most-active-user
+GET /api/v1/analytics/monthly-notes
+```
+
+---
+
+## Deployment Checklist
+
+Before deployment:
+
+* [x] Code pushed to GitHub
+* [x] `.env` is ignored by Git
+* [x] `.env.example` is available
+* [x] `npm test` passes locally
+* [x] `node server.js` works locally
+* [x] MongoDB Atlas URI is ready
+* [x] Cloudinary credentials are ready
+* [x] Strong production JWT secret is ready
+* [x] `start` script is configured
+* [x] `app.js` exports the Express app
+* [x] `server.js` starts the server
+
+After deployment:
+
+* [x] Render service created
+* [x] Environment variables added to Render
+* [x] MongoDB Atlas connected
+* [x] Cloudinary upload tested
+* [x] Health route tested
+* [x] Swagger docs tested
+* [x] Auth routes tested
+* [x] Notes routes tested
+* [x] Attachment upload tested
+* [x] Profile picture upload tested
+* [x] Comment routes tested
+* [x] Analytics routes tested
+* [x] Postman production environment created
+
+---
+
+## Common Deployment Issues
+
+### Missing Environment Variable
+
+If deployment fails with an error like:
+
+```text
+Missing required environment variable
+```
+
+Check Render environment variables and make sure all required keys are added.
+
+---
+
+### MongoDB Connection Failed
+
+If MongoDB connection fails:
+
+* Check `MONGO_URI`
+* Check username and password
+* Check database user permissions
+* Check MongoDB Atlas Network Access
+* Make sure Atlas allows access from Render
+
+---
+
+### Cloudinary Upload Failed
+
+If file upload fails:
+
+* Check `CLOUDINARY_CLOUD_NAME`
+* Check `CLOUDINARY_API_KEY`
+* Check `CLOUDINARY_API_SECRET`
+* Make sure the variable names match `config/env.js`
+
+---
+
+### CORS Error
+
+If frontend requests are blocked:
+
+* Check `CLIENT_URL`
+* Make sure it matches the frontend URL exactly
+* Include `https://` in production frontend URL
+* Redeploy after changing environment variables
+
+---
+
+### Swagger Shows Localhost
+
+If Swagger still shows:
+
+```text
+http://localhost:5000
+```
+
+Add this environment variable in Render:
+
+```env
+SERVER_URL=https://your-render-url.onrender.com
+```
+
+Then make sure `config/swagger.js` uses:
+
+```javascript
+servers: [
+  {
+    url: config.serverUrl,
+    description: "Current server"
+  }
+]
+```
+
+---
+
+## Production Start Command
+
+Render starts the backend using:
+
+```bash
+npm start
+```
+
+The `package.json` script should be:
+
+```json
+{
+  "scripts": {
+    "start": "node server.js"
+  }
+}
+```
+
+---
+
+## Deployment Status
+
+The backend API has been successfully deployed and tested in production.
+
+Verified production features:
+
+* Health check route
+* Swagger API documentation
+* JWT authentication
+* Notes CRUD
+* File uploads
+* Profile picture upload
+* Comments
+* Analytics
+* MongoDB Atlas connection
+* Cloudinary integration
+* Production environment variables
+
+
 # License
 
 This project is for learning and portfolio purposes.
