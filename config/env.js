@@ -30,6 +30,7 @@ module.exports = {
     jwtSecret: process.env.JWT_SECRET,
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || "1d",
     clientUrl: process.env.CLIENT_URL || "http://localhost:3000",
+    serverUrl: process.env.SERVER_URL || "http://localhost:5000",
 
     cloudinary: {
         cloudName: process.env.CLOUDINARY_CLOUD_NAME,
