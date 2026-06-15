@@ -31,7 +31,7 @@ router.get("/profile",auth,asyncHandler(getProfile));
 /**
  * @swagger
  * /api/v1/users/profile-picture:
- *   post:
+ *   patch:
  *     summary: Upload profile picture
  *     description: Uploads or replaces the authenticated user's profile picture.
  *     tags:
