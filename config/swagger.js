@@ -13,7 +13,7 @@ const options = {
         servers: [
             {
                 url: config.serverUrl,
-                description: "Local development server",
+                description: "Current server",
             },
         ],
         components: {
