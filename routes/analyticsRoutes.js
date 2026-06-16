@@ -4,7 +4,7 @@ const auth=require("../middleware/auth");
 const authorize=require("../middleware/authorize");
 const asyncHandler=require("../middleware/asyncHandler");
 
-const {notesPerUser,commentsPerUser,mostActiveUser,monthlyNotes}=require("../controllers/analyticsController");
+const {notesPerUser,commentsPerUser,mostActiveUser,monthlyNotes,getMostActiveUser}=require("../controllers/analyticsController");
 
 
 /**
@@ -89,5 +89,25 @@ router.get("/most-active-user",auth,authorize("admin"),asyncHandler(mostActiveUs
  *         description: Access denied
  */
 router.get("/monthly-notes",auth,authorize("admin"),asyncHandler(monthlyNotes));
+
+/**
+ * @swagger
+ * /api/v1/analytics/get-most-active-user:
+ *   get:
+ *     summary: Get most active user
+ *     description: Returns the user with the highest number of notes. Admin only.
+ *     tags:
+ *       - Analytics
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Most active user fetched successfully
+ *       401:
+ *         description: No token provided or invalid token
+ *       403:
+ *         description: Access denied
+ */
+router.get("/get-most-active-user",auth,authorize("admin"),asyncHandler(getMostActiveUser));
 
 module.exports=router;
