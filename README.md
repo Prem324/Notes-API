@@ -1,3 +1,5 @@
+![Run Backend Tests](https://github.com/Prem324/notes-api/actions/workflows/test.yml/badge.svg)
+
 # Notes API
 
 A production-ready REST API built with Node.js, Express.js, MongoDB, and JWT authentication.
