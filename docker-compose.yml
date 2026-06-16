@@ -1,4 +1,10 @@
 services:
+  redis:
+    image: redis:7
+    container_name: notes-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped  
   api:
     build: .
     ports:
