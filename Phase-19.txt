@@ -1,0 +1,127 @@
+Phase 19 — CI/CD Basics
+19.1 What CI/CD means
+19.2 GitHub Actions basics
+19.3 Run tests automatically on push
+19.4 Add workflow file
+19.5 Protect main branch mindset
+19.6 Deployment automation with Render
+
+
+CI/CD means automating checks and deployment.
+
+For your backend, the simple meaning is:
+When I push code to GitHub,
+GitHub should automatically run tests.
+If tests pass, the code is safer to deploy.
+
+
+What is CI?
+
+CI means Continuous Integration.
+
+In simple terms:
+
+Automatically test your code whenever you push to GitHub.
+
+Example:
+
+You push code
+↓
+GitHub Actions starts
+↓
+npm install runs
+↓
+npm test runs
+↓
+GitHub shows pass or fail
+
+So if you accidentally break authentication, notes, uploads, or error handling, CI catches it early.
+
+
+What is CD?
+
+CD means Continuous Deployment or Continuous Delivery.
+
+In your case, Render already gives you a basic CD flow:
+
+Push to GitHub main branch
+↓
+Render detects new commit
+↓
+Render redeploys backend
+
+So you already have a form of CD.
+
+Now we’ll add CI using GitHub Actions.
+
+
+Phase 19.1 — GitHub Actions Basics
+
+GitHub Actions uses workflow files inside this folder:
+
+.github/workflows
+
+A workflow file is written in YAML.
+
+Example:
+
+.github/workflows/test.yml
+
+This file tells GitHub:
+
+When code is pushed,
+run these commands.
+
+
+
+Phase 19.2 — Create CI Test Workflow
+
+In your project root, create folders:
+
+.github/workflows
+
+Inside that, create:
+
+test.yml
+
+Full path:
+
+.github/workflows/test.yml
+
+Add this:
+
+name: Run Backend Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      JWT_SECRET: testsecret
+      MONGO_URI: mongodb://localhost/test
+      CLIENT_URL: http://localhost:3000
+      SERVER_URL: http://localhost:5000
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
