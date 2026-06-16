@@ -5,6 +5,7 @@ const AppError=require("../utils/AppError");
 
 const getProfile=async(userId)=>{
     return await User.findById(userId)
+    .select("-password")
     .populate(
         "notes",
         "title content createdAt"

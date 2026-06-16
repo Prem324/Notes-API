@@ -9,6 +9,7 @@ const sanitizeRequest = require("./middleware/sanitizeRequest");
 const requestLogger = require("./middleware/requestLogger");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
+const compression = require("compression");
 
 const healthRoutes = require("./routes/healthRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -23,6 +24,7 @@ const app = express();
 app.disable("x-powered-by");
 app.use(helmet());
 app.use(cors({origin:config.clientUrl,credentials:true}));
+app.use(compression());
 app.use(express.json({limit:"100kb"}));
 app.use(express.urlencoded({extended:true,limit:"100kb",}))
 app.use(sanitizeRequest);

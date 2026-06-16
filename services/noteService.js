@@ -16,20 +16,22 @@ const getAllNotes=async(userId,role,page,limit,search)=>{
     }
 
     const totalNotes = await Note.countDocuments(query);
+    const totalPages = Math.ceil(totalNotes/limit);
     
     const notes=await Note.find(query)
     .populate("user","name email role")
     .skip((page-1)*limit)
     .limit(limit)
-    .sort({createdAt:-1,});
+    .sort({createdAt:-1,})
+    .lean();
     return {
       notes,
       pagination:{
         totalNotes,
         currentPage:page,
-        totalPages:Math.ceil(totalNotes/limit),
+        totalPages,
         limit,
-        hasNextPage:page<Math.ceil(totalNotes/limit),
+        hasNextPage:page<totalPages,
         hasPrevPage:page>1,
       },
     };

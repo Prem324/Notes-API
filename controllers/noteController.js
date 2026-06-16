@@ -4,8 +4,8 @@ const mediaService=require("../services/mediaService");
 const AppError=require("../utils/AppError");
 const {sendSuccess}=require("../utils/apiResponse");
 const getNotes=async(req,res)=>{
-    const page=parseInt(req.query.page)||1;
-    const limit=parseInt(req.query.limit)||10;
+    const page=Math.max(parseInt(req.query.page)||1,1);
+    const limit=Math.min(Math.max(parseInt(req.query.limit)||10,1),50);
     const search=req.query.search||"";
 
     const result=await noteService.getAllNotes(req.user.id,req.user.role,page,limit,search);
