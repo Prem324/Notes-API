@@ -13,11 +13,18 @@ const createComment=async(text,noteId,userId)=>{
         );
     }
     
-    return await Comment.create({
+    const comment = await Comment.create({
         text,
         note:noteId,
         user:userId
     });
+
+    const populatedComment = await Comment.findById(comment._id)
+        .populate("user", "name email")
+        .populate("note", "title")
+        .lean();
+
+    return populatedComment;
 };
 
 const getCommentsByNote=async(noteId)=>{

@@ -2,6 +2,7 @@ const app = require("./app");
 const connectDB = require("./config/db");
 const config = require("./config/env");
 const mongoose = require("mongoose");
+const {initSocket}=require("./config/socket");
 
 let server;
 
@@ -11,7 +12,11 @@ const startServer = async () => {
     server = app.listen(config.port, () => {
         console.log(`Server running on ${config.port}`);
     });
+
+    initSocket(server);
+
 };
+
 
 const shutdown = async (signal) => {
     console.log(`${signal} received. Shutting down gracefully...`);
