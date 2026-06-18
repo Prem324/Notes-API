@@ -50,7 +50,7 @@ describe("Auth Routes", () => {
         const requestBody = {
             name: "Prem",
             email: "prem@gmail.com",
-            password: "123456",
+            password: "Password123",
         };
 
         const fakeUser = {
@@ -106,7 +106,7 @@ describe("Auth Routes", () => {
         const invalidBody = {
             name: "Prem",
             email: "invalid-email",
-            password: "123456",
+            password: "Password123",
         };
 
 
@@ -144,7 +144,7 @@ describe("Auth Routes", () => {
 
         const requestBody = {
             email: "prem@gmail.com",
-            password: "123456",
+            password: "Password123",
         };
 
         authService.loginUser.mockResolvedValue(
@@ -179,7 +179,7 @@ describe("Auth Routes", () => {
             authService.loginUser
         ).toHaveBeenCalledWith(
             "prem@gmail.com",
-            "123456"
+            "Password123"
         );
     });
 
@@ -245,7 +245,7 @@ describe("Auth Routes", () => {
             .post("/api/v1/auth/login")
             .send({
                 email: "prem@gmail.com",
-                password: "wrong-password",
+                password: "WrongPassword123",
             });
 
 
@@ -264,7 +264,7 @@ describe("Auth Routes", () => {
             authService.loginUser
         ).toHaveBeenCalledWith(
             "prem@gmail.com",
-            "wrong-password"
+            "WrongPassword123"
         );
     });
 

@@ -6,20 +6,16 @@ const {
     getCommentsByNote,
 } = require("../services/commentService");
 
-
 // Mock models
 jest.mock("../models/Comment");
 jest.mock("../models/Note");
 
-
-// Clear old mock history before every test
 beforeEach(() => {
     jest.clearAllMocks();
 });
 
-
 describe("commentService - createComment", () => {
-    test("should create comment successfully", async () => {
+    test("should create comment successfully and return populated comment", async () => {
         // =====================
         // ARRANGE
         // =====================
@@ -29,19 +25,50 @@ describe("commentService - createComment", () => {
             title: "Test Note",
         };
 
-        const fakeComment = {
+        const createdComment = {
             _id: "comment123",
             text: "This is a test comment",
             note: "note123",
             user: "user123",
         };
 
-        // Note exists
+        const populatedComment = {
+            _id: "comment123",
+            text: "This is a test comment",
+            note: {
+                _id: "note123",
+                title: "Test Note",
+            },
+            user: {
+                _id: "user123",
+                name: "Prem",
+                email: "prem@example.com",
+            },
+        };
+
         Note.findById.mockResolvedValue(fakeNote);
 
-        // Comment is created
-        Comment.create.mockResolvedValue(fakeComment);
+        Comment.create.mockResolvedValue(createdComment);
 
+        const leanMock = jest
+            .fn()
+            .mockResolvedValue(populatedComment);
+
+        const secondPopulateMock = jest
+            .fn()
+            .mockReturnValue({
+                lean: leanMock,
+            });
+
+        const firstPopulateMock = jest
+            .fn()
+            .mockReturnValue({
+                populate: secondPopulateMock,
+            });
+
+        Comment.findById.mockReturnValue({
+            populate: firstPopulateMock,
+        });
 
         // =====================
         // ACT
@@ -53,14 +80,11 @@ describe("commentService - createComment", () => {
             "user123"
         );
 
-
         // =====================
         // ASSERT
         // =====================
 
-        expect(Note.findById).toHaveBeenCalledWith(
-            "note123"
-        );
+        expect(Note.findById).toHaveBeenCalledWith("note123");
 
         expect(Comment.create).toHaveBeenCalledWith({
             text: "This is a test comment",
@@ -68,18 +92,31 @@ describe("commentService - createComment", () => {
             user: "user123",
         });
 
-        expect(result).toEqual(fakeComment);
-    });
+        expect(Comment.findById).toHaveBeenCalledWith(
+            "comment123"
+        );
 
+        expect(firstPopulateMock).toHaveBeenCalledWith(
+            "user",
+            "name email"
+        );
+
+        expect(secondPopulateMock).toHaveBeenCalledWith(
+            "note",
+            "title"
+        );
+
+        expect(leanMock).toHaveBeenCalled();
+
+        expect(result).toEqual(populatedComment);
+    });
 
     test("should throw error when note does not exist", async () => {
         // =====================
         // ARRANGE
         // =====================
 
-        // Note not found
         Note.findById.mockResolvedValue(null);
-
 
         // =====================
         // ACT + ASSERT
@@ -92,22 +129,18 @@ describe("commentService - createComment", () => {
                 "user123"
             )
         ).rejects.toMatchObject({
-            message:"Note not found",
-            statusCode:404,
+            message: "Note not found",
+            statusCode: 404,
         });
 
-
-        // Verify note lookup happened
         expect(Note.findById).toHaveBeenCalledWith(
             "wrongNoteId"
         );
 
-        // Very important:
-        // If note does not exist, comment should not be created
         expect(Comment.create).not.toHaveBeenCalled();
+        expect(Comment.findById).not.toHaveBeenCalled();
     });
 });
-
 
 describe("commentService - getCommentsByNote", () => {
     test("should get comments by note successfully", async () => {
@@ -122,7 +155,6 @@ describe("commentService - getCommentsByNote", () => {
                 note: {
                     _id: "note123",
                     title: "Test Note",
-                    content: "Note content",
                 },
                 user: {
                     _id: "user123",
@@ -136,7 +168,6 @@ describe("commentService - getCommentsByNote", () => {
                 note: {
                     _id: "note123",
                     title: "Test Note",
-                    content: "Note content",
                 },
                 user: {
                     _id: "user456",
@@ -146,27 +177,28 @@ describe("commentService - getCommentsByNote", () => {
             },
         ];
 
-        // Fake Mongoose query chain:
-        // Comment.find().populate().populate().sort()
+        const leanMock = jest
+            .fn()
+            .mockResolvedValue(fakeComments);
+
+        const sortMock = jest
+            .fn()
+            .mockReturnValue({
+                lean: leanMock,
+            });
+
         const mockQuery = {
             populate: jest.fn().mockReturnThis(),
-
-            sort: jest.fn().mockResolvedValue(
-                fakeComments
-            ),
+            sort: sortMock,
         };
 
         Comment.find.mockReturnValue(mockQuery);
-
 
         // =====================
         // ACT
         // =====================
 
-        const result = await getCommentsByNote(
-            "note123"
-        );
-
+        const result = await getCommentsByNote("note123");
 
         // =====================
         // ASSERT
@@ -186,9 +218,11 @@ describe("commentService - getCommentsByNote", () => {
             "title content"
         );
 
-        expect(mockQuery.sort).toHaveBeenCalledWith({
+        expect(sortMock).toHaveBeenCalledWith({
             createdAt: -1,
         });
+
+        expect(leanMock).toHaveBeenCalled();
 
         expect(result).toEqual(fakeComments);
     });

@@ -69,7 +69,7 @@ describe("Register Integration Tests", () => {
             .send({
                 name: "Prem",
                 email: "prem@gmail.com",
-                password: "123456",
+                password: "Paaword123",
             });
 
         const response = await request(app)
@@ -77,7 +77,7 @@ describe("Register Integration Tests", () => {
             .send({
                 name: "Prem Again",
                 email: "prem@gmail.com",
-                password: "abcdef",
+                password: "PAssword123abc",
             });
 
         expect(response.statusCode).toBe(409);
@@ -101,7 +101,7 @@ describe("Register Integration Tests", () => {
             .send({
                 name: "Prem",
                 email: "invalid-email",
-                password: "123456",
+                password: "Password123",
             });
 
         expect(response.statusCode).toBe(400);
@@ -129,7 +129,7 @@ describe("Login Integration Tests", () => {
         .send({
             name: "Prem",
             email: "prem@gmail.com",
-            password: "123456",
+            password: "Password123",
         });
 
     expect(registerResponse.statusCode).toBe(201);
@@ -143,7 +143,7 @@ describe("Login Integration Tests", () => {
         .post("/api/v1/auth/login")
         .send({
             email: "prem@gmail.com",
-            password: "123456",
+            password: "Password123",
         });
 
 
@@ -170,7 +170,7 @@ test("POST /api/v1/auth/login should reject invalid password", async () => {
         .send({
             name: "Prem",
             email: "prem@gmail.com",
-            password: "123456",
+            password: "Password123",
         });
 
 
@@ -182,7 +182,7 @@ test("POST /api/v1/auth/login should reject invalid password", async () => {
         .post("/api/v1/auth/login")
         .send({
             email: "prem@gmail.com",
-            password: "wrong-password",
+            password: "WrongPassword123",
         });
 
 
@@ -206,7 +206,7 @@ test("POST /api/v1/auth/login should reject non-existing user", async () => {
         .post("/api/v1/auth/login")
         .send({
             email: "missing@gmail.com",
-            password: "123456",
+            password: "Password123",
         });
 
 
@@ -259,7 +259,7 @@ describe("Profile Integration Tests", () => {
         .send({
             name: "Prem",
             email: "prem@gmail.com",
-            password: "123456",
+            password: "Password123",
         });
 
     expect(registerResponse.statusCode).toBe(201);
@@ -268,7 +268,7 @@ describe("Profile Integration Tests", () => {
         .post("/api/v1/auth/login")
         .send({
             email: "prem@gmail.com",
-            password: "123456",
+            password: "Password123",
         });
 
     expect(loginResponse.statusCode).toBe(200);

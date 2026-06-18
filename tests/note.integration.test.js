@@ -37,7 +37,7 @@ afterAll(async () => {
 const registerAndLogin = async (
     name="Prem",
     email="prem@gmail.com",
-    password = "123456"
+    password = "Password123"
 ) => {
     await request(app)
         .post("/api/v1/auth/register")

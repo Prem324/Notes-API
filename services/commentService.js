@@ -40,7 +40,8 @@ const getCommentsByNote=async(noteId)=>{
 
     .sort({
         createdAt:-1
-    });
+    })
+    .lean()
 }
 
 module.exports={createComment,getCommentsByNote};

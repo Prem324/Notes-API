@@ -13,7 +13,7 @@ describe("auth validators", () => {
             const validData = {
                 name: "Prem",
                 email: "prem@gmail.com",
-                password: "123456",
+                password: "Password123",
             };
 
 
@@ -60,7 +60,7 @@ describe("auth validators", () => {
             const invalidData = {
                 name: "Prem",
                 email: "invalid-email",
-                password: "123456",
+                password: "Password123",
             };
 
             const result = registerSchema.validate(
@@ -99,7 +99,7 @@ describe("auth validators", () => {
         test("should pass with valid login data", () => {
             const validData = {
                 email: "prem@gmail.com",
-                password: "123456",
+                password: "Password123",
             };
 
             const result = loginSchema.validate(
@@ -116,7 +116,7 @@ describe("auth validators", () => {
 
         test("should fail when email is missing", () => {
             const invalidData = {
-                password: "123456",
+                password: "Password123",
             };
 
             const result = loginSchema.validate(
